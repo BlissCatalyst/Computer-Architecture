@@ -10,8 +10,8 @@ class CPU:
         """Construct a new CPU."""
         self.reg = [0] * 8
         self.reg[7] = 0xF4
-        self.ram = [0]
-        self.pc = 0
+        self.ram = []
+        self.pc = 0x00
         self.fl = 0
 
     def load(self):
@@ -72,4 +72,16 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        instrReg = self.pc
+        operand_a = self.ram_read(instrReg + 1)
+        operand_b = self.ram_read(instrReg + 2)
+
+        # TODO: Implement command if else statements
+
+        change_pc = instrReg >> 6
+        if change_pc == 0b01:
+            self.pc = operand_a + 1
+        elif change_pc == 0b10:
+            self.pc = operand_b + 1
+        elif change_pc == 0b00:
+            self.pc += 1
