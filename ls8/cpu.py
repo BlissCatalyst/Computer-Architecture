@@ -10,6 +10,7 @@ class CPU:
         """Construct a new CPU."""
         self.reg = [0] * 8
         self.reg[7] = 0xF4
+        self.ram = [0]
         self.pc = 0
         self.fl = 0
 
@@ -33,6 +34,12 @@ class CPU:
         for instruction in program:
             self.ram[address] = instruction
             address += 1
+
+    def ram_read(self, read_address):
+        return self.ram[read_address]
+
+    def ram_write(self, write_value, write_address):
+        pass
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
