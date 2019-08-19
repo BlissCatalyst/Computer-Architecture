@@ -2,6 +2,10 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 
 class CPU:
     """Main CPU class."""
@@ -10,7 +14,7 @@ class CPU:
         """Construct a new CPU."""
         self.reg = [0] * 8
         self.reg[7] = 0xF4
-        self.ram = []
+        self.ram = [0] * 256
         self.pc = 0
         self.fl = 0
 
@@ -39,7 +43,7 @@ class CPU:
         return self.ram[read_address]
 
     def ram_write(self, write_value, write_address):
-        pass
+        self.ram[write_address] = write_value
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -73,17 +77,27 @@ class CPU:
     def run(self):
         """Run the CPU."""
         instrReg = self.pc
-        operand_a = self.ram_read(instrReg + 1)
-        operand_b = self.ram_read(instrReg + 2)
+        print(self.pc)
+        print("run() Ran")
+        while instrReg:
+            print("Inside while instrReg")
+            operand_a = self.ram_read(instrReg + 1)
+            operand_b = self.ram_read(instrReg + 2)
 
-        # TODO: Implement command if else statements
+            # COMMANDS
+            if instrReg == HLT:
+                exit()
+            elif instrReg == LDI:
+                self.reg[operand_a] = operand_b
+            elif instrReg == PRN:
+                print(f"Register: {operand_a}, Value: {self.reg[operand_a]}")
 
-        change_pc = instrReg >> 6
-        if change_pc == 0b01:
-            self.pc = operand_a + 1
-        elif change_pc == 0b10:
-            self.pc = operand_b + 1
-        elif change_pc == 0b00:
-            self.pc += 1
-        else:
-            print("There should not be 3 operands!")
+            change_pc = instrReg >> 6
+            if change_pc == 0b01:
+                self.pc = operand_a + 1
+            elif change_pc == 0b10:
+                self.pc = operand_b + 1
+            elif change_pc == 0b00:
+                self.pc += 1
+            else:
+                print("There should not be 3 operands!")
