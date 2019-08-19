@@ -11,7 +11,7 @@ class CPU:
         self.reg = [0] * 8
         self.reg[7] = 0xF4
         self.ram = []
-        self.pc = 0x00
+        self.pc = 0
         self.fl = 0
 
     def load(self):
@@ -85,3 +85,5 @@ class CPU:
             self.pc = operand_b + 1
         elif change_pc == 0b00:
             self.pc += 1
+        else:
+            print("There should not be 3 operands!")
