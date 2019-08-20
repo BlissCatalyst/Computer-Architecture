@@ -76,27 +76,28 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        instrReg = self.pc
-        print(self.pc)
-        print("run() Ran")
-        while instrReg:
-            print("Inside while instrReg")
-            operand_a = self.ram_read(instrReg + 1)
-            operand_b = self.ram_read(instrReg + 2)
+        while True:
+            instrReg = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
 
             # COMMANDS
             if instrReg == HLT:
+                print("HLT")
                 exit()
             elif instrReg == LDI:
+                print("LDI")
                 self.reg[operand_a] = operand_b
             elif instrReg == PRN:
+                print("PRN")
                 print(f"Register: {operand_a}, Value: {self.reg[operand_a]}")
 
-            change_pc = instrReg >> 6
+            change_pc = instrReg
+            change_pc = change_pc >> 6
             if change_pc == 0b01:
-                self.pc = operand_a + 1
+                self.pc += 2
             elif change_pc == 0b10:
-                self.pc = operand_b + 1
+                self.pc += 3
             elif change_pc == 0b00:
                 self.pc += 1
             else:
