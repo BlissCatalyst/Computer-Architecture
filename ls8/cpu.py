@@ -65,8 +65,9 @@ class CPU:
         self.reg[7] -= 1
         self.ram_write(self.reg[register], self.reg[7])
 
-    def pop(self):
-        pass
+    def pop(self, register):
+        self.reg[register] = self.ram_read(self.reg[7])
+        self.reg[7] += 1
 
     def ram_read(self, read_address):
         return self.ram[read_address]
