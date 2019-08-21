@@ -2,41 +2,89 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+MUL = 0b10100010
+PUSH = 0b01000101
+POP = 0b01000110
+
+if len(sys.argv) != 2:
+    print("usage: file.py <filename>", file=sys.stderr)
+    sys.exit(1)
+
+filepath = sys.argv[1]
+
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.reg = [0] * 8
+        self.reg[7] = 0xF4
+        self.ram = [0] * 256
+        self.pc = 0
+        self.fl = 0
+        self.branchtable = {}
+        self.branchtable[MUL] = self.alu
 
     def load(self):
         """Load a program into memory."""
+        if len(sys.argv) != 2:
+            print("usage: file.py <filename>", file=sys.stderr)
+            sys.exit(1)
 
-        address = 0
+        filepath = sys.argv[1]
 
-        # For now, we've just hardcoded a program:
+        try:
+            address = 0
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+            with open(filepath) as f:
+                for line in f:
+                    # print(f'line: {line}')
+                    # Split before and after any comment symbols
+                    comment_split = line.split("#")
+                    # print(f'comment_split: {comment_split}')
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+                    num = comment_split[0].strip()
+                    # print(f'num: {num}')
+                    # Ignore blanks
+                    if num == "":
+                        continue
 
+                    value = int(num, 2)
+
+                    self.ram[address] = value
+
+                    address += 1
+
+        except FileNotFoundError:
+            print(f"{sys.argv[0]}: {sys.argv[1]} not found")
+            sys.exit(2)
+
+    def push(self, register):
+        self.reg[7] -= 1
+        self.ram_write(self.reg[register], self.reg[7])
+
+    def pop(self, register):
+        self.reg[register] = self.ram_read(self.reg[7])
+        self.reg[7] += 1
+
+    def ram_read(self, read_address):
+        return self.ram[read_address]
+
+    def ram_write(self, write_value, write_address):
+        self.ram[write_address] = write_value
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        # elif op == "SUB": etc
+        if op == "MUL":
+            self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -48,8 +96,8 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
-            #self.ie,
+            # self.fl,
+            # self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
             self.ram_read(self.pc + 2)
@@ -62,4 +110,36 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        self.load()
+        while True:
+            instrReg = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+
+            # COMMANDS
+            if instrReg == HLT:
+                print("HLT")
+                exit()
+            elif instrReg == LDI:
+                print("LDI")
+                self.reg[operand_a] = operand_b
+            elif instrReg == PRN:
+                print("PRN")
+                print(f"Register: {operand_a}, Value: {self.reg[operand_a]}")
+            elif instrReg == MUL:
+                self.alu("MUL", operand_a, operand_b)
+            elif instrReg == PUSH:
+                self.push(operand_a)
+            elif instrReg == POP:
+                self.pop(operand_a)
+
+            change_pc = instrReg
+            change_pc = change_pc >> 6
+            if change_pc == 0b01:
+                self.pc += 2
+            elif change_pc == 0b10:
+                self.pc += 3
+            elif change_pc == 0b00:
+                self.pc += 1
+            else:
+                print("There should not be 3 operands!")
