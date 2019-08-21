@@ -6,6 +6,8 @@ HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+PUSH = 0b01000101
+POP = 0b01000110
 
 if len(sys.argv) != 2:
     print("usage: file.py <filename>", file=sys.stderr)
@@ -126,6 +128,10 @@ class CPU:
                 print(f"Register: {operand_a}, Value: {self.reg[operand_a]}")
             elif instrReg == MUL:
                 self.alu("MUL", operand_a, operand_b)
+            elif instrReg == PUSH:
+                self.push(operand_a)
+            elif instrReg == POP:
+                self.pop(operand_a)
 
             change_pc = instrReg
             change_pc = change_pc >> 6
