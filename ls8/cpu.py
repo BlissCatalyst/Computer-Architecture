@@ -81,3 +81,5 @@ class CPU:
 
             if ir == "HLT":
                 break
+            else:
+                print(f'\"{ir}\" is an unrecognized command!')
