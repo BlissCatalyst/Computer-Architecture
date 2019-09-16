@@ -89,8 +89,8 @@ class CPU:
                 self.ram_write(operand_b, operand_a)
                 self.pc += 3
             elif ir == PRN:
-                p_value = self.ram_read(operand_a)
-                print(f"REGISTER: {operand_a}, VALUE: {p_value}")
+                prn_value = self.ram_read(operand_a)
+                print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
                 self.pc += 2
             else:
                 print(f'\"{ir}\" is an unrecognized command!')
