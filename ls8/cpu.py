@@ -2,6 +2,10 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 
 class CPU:
     """Main CPU class."""
@@ -79,7 +83,12 @@ class CPU:
             operand_a, operand_b = self.ram_read(
                 self.pc + 1), self.ram_read(self.pc + 2)
 
-            if ir == "HLT":
+            if ir == HLT:
                 break
+            elif ir == LDI:
+                self.ram_write(operand_b, operand_a)
+            elif ir == PRN:
+                p_value = self.ram_read(operand_a)
+                print(f"REGISTER: {operand_a}, VALUE: {p_value}")
             else:
                 print(f'\"{ir}\" is an unrecognized command!')
