@@ -9,12 +9,12 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.pc = 0
-        self.ir = 0
         self.mar = 0
         self.mdr = 0
         self.fl = 0
         self.ram = [0] * 256
         self.reg = [0] * 8
+        self.reg[7] = 0xF4
 
     def load(self):
         """Load a program into memory."""
@@ -74,4 +74,10 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        while True:
+            ir = self.ram_read(self.pc)
+            operand_a, operand_b = self.ram_read(
+                self.pc + 1), self.ram_read(self.pc + 2)
+
+            if ir == "HLT":
+                break
