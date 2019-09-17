@@ -56,6 +56,15 @@ class CPU:
         else:
             raise Exception("Unsupported ALU operation")
 
+    def pc_advance(self, ir):
+        flag_select = ir >> 6
+        if flag_select == 0b01:
+            self.pc += 2
+        elif flag_select == 0b10:
+            self.pc += 3
+        elif flag_select == 0b00:
+            self.pc += 1
+
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
@@ -87,10 +96,10 @@ class CPU:
                 break
             elif ir == LDI:
                 self.ram_write(operand_b, operand_a)
-                self.pc += 3
             elif ir == PRN:
                 prn_value = self.ram_read(operand_a)
                 print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
-                self.pc += 2
             else:
                 print(f'\"{ir}\" is an unrecognized command!')
+
+            self.pc_advance(ir)
