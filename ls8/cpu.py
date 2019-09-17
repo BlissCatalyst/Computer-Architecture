@@ -5,6 +5,7 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
+MUL = 0b10100010
 
 
 class CPU:
@@ -63,12 +64,14 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        # elif op == "SUB": etc
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
     def pc_advance(self, ir):
-        flag_select = ir >> 6
+        flag_select = ir
+        flag_select = flag_select >> 6
         if flag_select == 0b01:
             self.pc += 2
         elif flag_select == 0b10:
@@ -106,10 +109,12 @@ class CPU:
             if ir == HLT:
                 break
             elif ir == LDI:
-                self.ram_write(operand_b, operand_a)
+                self.reg[operand_a] = operand_b
             elif ir == PRN:
-                prn_value = self.ram_read(operand_a)
+                prn_value = self.reg[operand_a]
                 print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
+            elif ir == MUL:
+                self.alu("MUL", operand_a, operand_b)
             else:
                 print(f'\"{ir}\" is an unrecognized command!')
 
