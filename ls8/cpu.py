@@ -20,6 +20,25 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.reg[7] = 0xF4
+        self.running = True
+        self.branchtable = {}
+        self.branchtable[HLT] = self.handle_HLT
+        self.branchtable[LDI] = self.handle_LDI
+        self.branchtable[PRN] = self.handle_PRN
+        self.branchtable[MUL] = self.handle_MUL
+
+    def handle_HLT(self, operand_a=0, operand_b=0):
+        self.running = False
+
+    def handle_LDI(self, operand_a=0, operand_b=0):
+        self.reg[operand_a] = operand_b
+
+    def handle_PRN(self, operand_a=0, operand_b=0):
+        prn_value = self.reg[operand_a]
+        print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
+
+    def handle_MUL(self, operand_a=0, operand_b=0):
+        self.alu("MUL", operand_a, operand_b)
 
     def load(self):
         """Load a program into memory."""
@@ -64,6 +83,8 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         else:
@@ -101,21 +122,23 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        while True:
+        while self.running:
             ir = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
-            if ir == HLT:
-                break
-            elif ir == LDI:
-                self.reg[operand_a] = operand_b
-            elif ir == PRN:
-                prn_value = self.reg[operand_a]
-                print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
-            elif ir == MUL:
-                self.alu("MUL", operand_a, operand_b)
-            else:
-                print(f'\"{ir}\" is an unrecognized command!')
+            self.branchtable[ir](operand_a, operand_b)
+
+            # if ir == HLT:
+            #     break
+            # elif ir == LDI:
+            #     self.reg[operand_a] = operand_b
+            # elif ir == PRN:
+            #     prn_value = self.reg[operand_a]
+            #     print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
+            # elif ir == MUL:
+            #     self.alu("MUL", operand_a, operand_b)
+            # else:
+            #     print(f'\"{ir}\" is an unrecognized command!')
 
             self.pc_advance(ir)
