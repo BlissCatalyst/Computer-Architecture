@@ -47,10 +47,10 @@ class CPU:
 
     def handle_PUSH(self, operand_a, operand_b):
         self.sp -= 1
-        self.ram_write(self.reg[operand_a], self.pc)
+        self.ram[self.sp] = self.reg[operand_a]
 
     def handle_POP(self, operand_a, operand_b):
-        self.reg[operand_a] = self.ram_read(self.sp)
+        self.reg[operand_a] = self.ram[self.sp]
         self.sp += 1
 
     def load(self):
