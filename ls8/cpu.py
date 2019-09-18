@@ -6,6 +6,7 @@ HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+PUSH = 0b01000101
 
 
 class CPU:
@@ -17,6 +18,7 @@ class CPU:
         self.mar = 0
         self.mdr = 0
         self.fl = 0
+        self.sp = 0xF4
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.reg[7] = 0xF4
@@ -26,6 +28,7 @@ class CPU:
         self.branchtable[LDI] = self.handle_LDI
         self.branchtable[PRN] = self.handle_PRN
         self.branchtable[MUL] = self.handle_MUL
+        self.branchtable[PUSH] = self.handle_PUSH
 
     def handle_HLT(self, operand_a, operand_b):
         self.running = False
@@ -39,6 +42,10 @@ class CPU:
 
     def handle_MUL(self, operand_a, operand_b):
         self.alu("MUL", operand_a, operand_b)
+
+    def handle_PUSH(self, operand_a, operand_b):
+        self.sp -= 1
+        self.ram_write(self.reg[operand_a], self.pc)
 
     def load(self):
         """Load a program into memory."""
@@ -56,21 +63,6 @@ class CPU:
                     address += 1
                 except ValueError:
                     pass
-        # For now, we've just hardcoded a program:
-
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010,  # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111,  # PRN R0
-        #     0b00000000,
-        #     0b00000001,  # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
 
     def ram_read(self, address):
         return self.ram[address]
