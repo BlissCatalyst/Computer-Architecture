@@ -7,6 +7,7 @@ LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
 PUSH = 0b01000101
+POP = 0b01000110
 
 
 class CPU:
@@ -29,6 +30,7 @@ class CPU:
         self.branchtable[PRN] = self.handle_PRN
         self.branchtable[MUL] = self.handle_MUL
         self.branchtable[PUSH] = self.handle_PUSH
+        self.branchtable[POP] = self.handle_POP
 
     def handle_HLT(self, operand_a, operand_b):
         self.running = False
@@ -46,6 +48,10 @@ class CPU:
     def handle_PUSH(self, operand_a, operand_b):
         self.sp -= 1
         self.ram_write(self.reg[operand_a], self.pc)
+
+    def handle_POP(self, operand_a, operand_b):
+        self.reg[operand_a] = self.ram_read(self.sp)
+        self.sp += 1
 
     def load(self):
         """Load a program into memory."""
