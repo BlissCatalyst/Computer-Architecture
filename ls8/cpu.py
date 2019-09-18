@@ -129,16 +129,4 @@ class CPU:
 
             self.branchtable[ir](operand_a, operand_b)
 
-            # if ir == HLT:
-            #     break
-            # elif ir == LDI:
-            #     self.reg[operand_a] = operand_b
-            # elif ir == PRN:
-            #     prn_value = self.reg[operand_a]
-            #     print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
-            # elif ir == MUL:
-            #     self.alu("MUL", operand_a, operand_b)
-            # else:
-            #     print(f'\"{ir}\" is an unrecognized command!')
-
             self.pc_advance(ir)
