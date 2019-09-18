@@ -27,17 +27,17 @@ class CPU:
         self.branchtable[PRN] = self.handle_PRN
         self.branchtable[MUL] = self.handle_MUL
 
-    def handle_HLT(self, operand_a=0, operand_b=0):
+    def handle_HLT(self, operand_a, operand_b):
         self.running = False
 
-    def handle_LDI(self, operand_a=0, operand_b=0):
+    def handle_LDI(self, operand_a, operand_b):
         self.reg[operand_a] = operand_b
 
-    def handle_PRN(self, operand_a=0, operand_b=0):
+    def handle_PRN(self, operand_a, operand_b):
         prn_value = self.reg[operand_a]
         print(f"REGISTER: {operand_a}, VALUE: {prn_value}")
 
-    def handle_MUL(self, operand_a=0, operand_b=0):
+    def handle_MUL(self, operand_a, operand_b):
         self.alu("MUL", operand_a, operand_b)
 
     def load(self):
