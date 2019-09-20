@@ -62,20 +62,30 @@ class CPU:
         self.sp += 1
 
     def handle_CMP(self, operand_a, operand_b):
+        self.fl = 0
         self.alu("CMP", operand_a, operand_b)
+        print("CMP RAN")
 
     def handle_JMP(self, operand_a, operand_b):
         self.pc = self.reg[operand_a]
+        print("JMP RAN")
 
     def handle_JEQ(self, operand_a, operand_b):
-        if_flags = self.fl >> 7
+        if_flags = self.fl
+        print(bin(if_flags))
         if if_flags & 0b001 == 0b001:
             self.pc = self.reg[operand_a]
+        else:
+            self.pc += 2
+        print("JEQ RAN")
 
     def handle_JNE(self, operand_a, operand_b):
-        if_flags = self.fl >> 7
+        if_flags = self.fl
         if if_flags & 0b001 == 0b000:
             self.pc = self.reg[operand_a]
+        else:
+            self.pc += 2
+        print("JNE RAN")
 
     def load(self):
         """Load a program into memory."""
@@ -110,25 +120,29 @@ class CPU:
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "CMP":
-            if reg_a > reg_b:
+            if self.reg[reg_a] > self.reg[reg_b]:
                 self.fl = 0b00000010
-            elif reg_a < reg_b:
+            elif self.reg[reg_a] < self.reg[reg_b]:
                 self.fl = 0b00000100
             else:
+                print("they are equal")
                 self.fl = 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
     def pc_advance(self, ir):
         flag_select = ir
-        flag_select = flag_select >> 6
+        flag_select = flag_select >> 4
 
-        if flag_select == 0b01:
-            self.pc += 2
-        elif flag_select == 0b10:
-            self.pc += 3
-        elif flag_select == 0b00:
-            self.pc += 1
+        if flag_select & 0b0001 == 0b0001:
+            pass
+        else:
+            if flag_select & 0b0100 == 0b0100:
+                self.pc += 2
+            elif flag_select & 0b1000 == 0b1000:
+                self.pc += 3
+            elif flag_select & 0b1100 == 0b0000:
+                self.pc += 1
 
     def trace(self):
         """
