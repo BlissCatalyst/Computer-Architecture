@@ -10,6 +10,7 @@ PUSH = 0b01000101
 POP = 0b01000110
 CMP = 0b10100111
 JMP = 0b01010100
+JEQ = 0b01010101
 
 
 class CPU:
@@ -35,6 +36,7 @@ class CPU:
         self.branchtable[POP] = self.handle_POP
         self.branchtable[CMP] = self.handle_CMP
         self.branchtable[JMP] = self.handle_JMP
+        self.branchtable[JEQ] = self.handle_JEQ
 
     def handle_HLT(self, operand_a, operand_b):
         self.running = False
@@ -62,6 +64,11 @@ class CPU:
 
     def handle_JMP(self, operand_a, operand_b):
         self.pc = self.reg[operand_a]
+
+    def handle_JEQ(self, operand_a, operand_b):
+        if_flags = self.fl >> 7
+        if if_flags & 0b001 == 0b001:
+            self.pc = self.reg[operand_a]
 
     def load(self):
         """Load a program into memory."""
