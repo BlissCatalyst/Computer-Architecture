@@ -64,20 +64,16 @@ class CPU:
     def handle_CMP(self, operand_a, operand_b):
         self.fl = 0
         self.alu("CMP", operand_a, operand_b)
-        print("CMP RAN")
 
     def handle_JMP(self, operand_a, operand_b):
         self.pc = self.reg[operand_a]
-        print("JMP RAN")
 
     def handle_JEQ(self, operand_a, operand_b):
         if_flags = self.fl
-        print(bin(if_flags))
         if if_flags & 0b001 == 0b001:
             self.pc = self.reg[operand_a]
         else:
             self.pc += 2
-        print("JEQ RAN")
 
     def handle_JNE(self, operand_a, operand_b):
         if_flags = self.fl
@@ -85,7 +81,6 @@ class CPU:
             self.pc = self.reg[operand_a]
         else:
             self.pc += 2
-        print("JNE RAN")
 
     def load(self):
         """Load a program into memory."""
@@ -125,7 +120,6 @@ class CPU:
             elif self.reg[reg_a] < self.reg[reg_b]:
                 self.fl = 0b00000100
             else:
-                print("they are equal")
                 self.fl = 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
