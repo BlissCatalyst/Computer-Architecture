@@ -8,6 +8,7 @@ PRN = 0b01000111
 MUL = 0b10100010
 PUSH = 0b01000101
 POP = 0b01000110
+CMP = 0b10100111
 
 
 class CPU:
@@ -31,6 +32,7 @@ class CPU:
         self.branchtable[MUL] = self.handle_MUL
         self.branchtable[PUSH] = self.handle_PUSH
         self.branchtable[POP] = self.handle_POP
+        self.branchtable[CMP] = self.handle_CMP
 
     def handle_HLT(self, operand_a, operand_b):
         self.running = False
@@ -52,6 +54,9 @@ class CPU:
     def handle_POP(self, operand_a, operand_b):
         self.reg[operand_a] = self.ram[self.sp]
         self.sp += 1
+
+    def handle_CMP(self, operand_a, operand_b):
+        self.alu("CMP", operand_a, operand_b)
 
     def load(self):
         """Load a program into memory."""
@@ -85,12 +90,20 @@ class CPU:
             self.reg[reg_a] -= self.reg[reg_b]
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            if reg_a > reg_b:
+                self.fl = 0b00000010
+            elif reg_a < reg_b:
+                self.fl = 0b00000100
+            else:
+                self.fl = 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
     def pc_advance(self, ir):
         flag_select = ir
         flag_select = flag_select >> 6
+
         if flag_select == 0b01:
             self.pc += 2
         elif flag_select == 0b10:
