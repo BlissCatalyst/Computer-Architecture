@@ -11,6 +11,7 @@ POP = 0b01000110
 CMP = 0b10100111
 JMP = 0b01010100
 JEQ = 0b01010101
+JNE = 0b01010110
 
 
 class CPU:
@@ -37,6 +38,7 @@ class CPU:
         self.branchtable[CMP] = self.handle_CMP
         self.branchtable[JMP] = self.handle_JMP
         self.branchtable[JEQ] = self.handle_JEQ
+        self.branchtable[JNE] = self.handle_JNE
 
     def handle_HLT(self, operand_a, operand_b):
         self.running = False
@@ -68,6 +70,11 @@ class CPU:
     def handle_JEQ(self, operand_a, operand_b):
         if_flags = self.fl >> 7
         if if_flags & 0b001 == 0b001:
+            self.pc = self.reg[operand_a]
+
+    def handle_JNE(self, operand_a, operand_b):
+        if_flags = self.fl >> 7
+        if if_flags & 0b001 == 0b000:
             self.pc = self.reg[operand_a]
 
     def load(self):
