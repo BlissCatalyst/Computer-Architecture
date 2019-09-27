@@ -12,6 +12,8 @@ CMP = 0b10100111
 JMP = 0b01010100
 JEQ = 0b01010101
 JNE = 0b01010110
+OR = 0b10101010
+ADD = 0b10100000
 
 
 class CPU:
@@ -39,6 +41,8 @@ class CPU:
         self.branchtable[JMP] = self.handle_JMP
         self.branchtable[JEQ] = self.handle_JEQ
         self.branchtable[JNE] = self.handle_JNE
+        self.branchtable[OR] = self.handle_OR
+        self.branchtable[ADD] = self.handle_ADD
 
     def handle_HLT(self, operand_a, operand_b):
         self.running = False
@@ -82,6 +86,12 @@ class CPU:
         else:
             self.pc += 2
 
+    def handle_OR(self, operand_a, operand_b):
+        self.alu("OR", operand_a, operand_b)
+
+    def handle_ADD(self, operand_a, operand_b):
+        self.alu("ADD", operand_a, operand_b)
+
     def load(self):
         """Load a program into memory."""
 
@@ -121,6 +131,8 @@ class CPU:
                 self.fl = 0b00000100
             else:
                 self.fl = 0b00000001
+        elif op == "OR":
+            self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
